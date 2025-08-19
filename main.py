@@ -335,6 +335,66 @@ async def main():
         result = await handle_list_project_statuses(jira_service, arguments)
         return convert_result(result)
     
+    @mcp.tool()
+    async def link_issues(inward_issue: str, outward_issue: str, link_type: str) -> dict:
+        """Link two issues with a relationship type (blocks, duplicates, relates to, etc.)."""
+        arguments = {
+            "inward_issue": inward_issue,
+            "outward_issue": outward_issue,
+            "link_type": link_type
+        }
+        result = await handle_link_issues(jira_service, arguments)
+        return convert_result(result)
+    
+    @mcp.tool()
+    async def get_related_issues(issue_key: str) -> dict:
+        """Get all related issues and their relationships for a given issue."""
+        arguments = {"issue_key": issue_key}
+        result = await handle_get_related_issues(jira_service, arguments)
+        return convert_result(result)
+    
+    @mcp.tool()
+    async def get_issue_history(issue_key: str, max_results: int = 20) -> dict:
+        """Get the change history for an issue."""
+        arguments = {
+            "issue_key": issue_key,
+            "max_results": max_results
+        }
+        result = await handle_get_issue_history(jira_service, arguments)
+        return convert_result(result)
+    
+    @mcp.tool()
+    async def create_child_issue(
+        parent_key: str,
+        summary: str,
+        description: str = "",
+        priority: str = "Medium",
+        assignee: str = "",
+        labels: list[str] = None,
+        components: list[str] = None,
+        custom_fields: dict = None
+    ) -> dict:
+        """Create a child issue (subtask) under a parent issue."""
+        arguments = {
+            "parent_key": parent_key,
+            "summary": summary,
+            "description": description,
+            "priority": priority,
+            "assignee": assignee,
+            "labels": labels or [],
+            "components": components or [],
+            "custom_fields": custom_fields or {}
+        }
+        result = await handle_create_child_issue(jira_service, arguments)
+        return convert_result(result)
+    
+    @mcp.tool()
+    async def get_sprint(sprint_id: int) -> dict:
+        """Get detailed information about a specific sprint."""
+        arguments = {"sprint_id": sprint_id}
+        result = await handle_get_sprint(jira_service, arguments)
+        return convert_result(result)
+    
     print("✅ All Jira tools registered")
     
     try:
