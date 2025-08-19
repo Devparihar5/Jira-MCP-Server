@@ -1,45 +1,49 @@
 # Jira MCP Server - Python Implementation
 
-A Python-based MCP (Model Context Protocol) server for Atlassian Jira that enables AI assistants like Claude to interact with Jira. This is a complete Python rewrite of the original Go implementation, providing the same comprehensive functionality with Python's ecosystem benefits.
+A comprehensive Python-based MCP (Model Context Protocol) server for Atlassian Jira that enables AI assistants like Claude to interact with Jira seamlessly. This enterprise-grade solution provides full-featured Jira integration with robust error handling, multiple deployment modes, and extensive tool coverage.
 
 ## Features
 
-### Issue Management
+### Core Issue Management
 - **Get detailed issue information** with customizable fields and expansions
-- **Create new issues** with full field support
+- **Create new issues** with full field support and validation
 - **Create child issues (subtasks)** with automatic parent linking
-- **Update existing issues** with partial field updates
-- **Search issues** using powerful JQL (Jira Query Language)
-- **List available issue types** for any project
-- **Transition issues** through workflow states
-- **Move issues to sprints** (up to 50 issues at once)
+- **Update existing issues** with partial field updates and conflict resolution
+- **Search issues** using powerful JQL (Jira Query Language) with result formatting
+- **List available issue types** for any project with metadata
+- **Transition issues** through workflow states with validation
+
+### Advanced Issue Operations
+- **Move issues to sprints** (bulk operations up to 50 issues)
+- **Link issues** with relationship types (blocks, duplicates, relates to, etc.)
+- **Get related issues** and their complete relationship graph
+- **Retrieve issue history** and detailed change logs
+- **Track workflow transitions** and state changes
 
 ### Comments & Time Tracking
-- **Add comments** to issues
-- **Retrieve all comments** from issues
-- **Add worklogs** with time tracking and custom start times
-- **Flexible time format support** (3h, 30m, 1h 30m, etc.)
-
-### Issue Relationships & History
-- **Link issues** with relationship types (blocks, duplicates, relates to)
-- **Get related issues** and their relationships
-- **Retrieve complete issue history** and change logs
-- **Track issue transitions** and workflow changes
+- **Add comments** to issues with rich text formatting
+- **Retrieve all comments** from issues with threading support
+- **Add worklogs** with flexible time tracking and custom start times
+- **Time format support** (3h, 30m, 1h 30m, 2d 4h, etc.)
+- **Worklog management** with automatic time calculations
 
 ### Sprint & Project Management
-- **List all sprints** for boards or projects
-- **Get active sprint** information
-- **Get detailed sprint information** by ID
+- **List all sprints** for boards or projects with status filtering
+- **Get active sprint** information with issue details
+- **Get detailed sprint information** by ID with metrics
 - **List project statuses** and available transitions
-- **Board and project integration** with automatic discovery
+- **Get boards** with project associations and permissions
+- **Sprint analytics** and progress tracking
 
-### Advanced Features
-- **Bulk operations** support (move multiple issues to sprint)
-- **Flexible parameter handling** (board_id or project_key)
-- **Rich formatting** of responses for AI consumption
-- **Error handling** with detailed debugging information
-- **Async/await support** for better performance
-- **Type safety** with Pydantic models
+### Enterprise Features
+- **Async/await architecture** for high-performance operations
+- **Comprehensive error handling** with detailed debugging information
+- **Stdio mode deployment** optimized for MCP clients
+- **Docker containerization** with security best practices
+- **Environment-based configuration** with validation
+- **Rich response formatting** optimized for AI consumption
+- **Type safety** with Pydantic models and validation
+- **Bulk operations** with progress tracking and error recovery
 
 ## Installation
 
@@ -105,19 +109,24 @@ ATLASSIAN_TOKEN=your-api-token
 python main.py --env .env
 ```
 
-### HTTP Mode (for development/testing)
+### HTTP Server Mode
 
 ```bash
-python main.py --env .env --http-port 3000
+# Start HTTP server on default port 8000
+python main.py --http --env .env
+
+# Start HTTP server on custom port
+python main.py --http --port 3000 --env .env
+
+# Using the convenience script
+./start_http_server.sh --port 8000 --env .env
 ```
 
-Then configure your MCP client to connect to `http://localhost:3000/mcp`.
+## Configuration
 
-## Cursor Configuration
+### Cursor Configuration
 
-Add this to your Cursor MCP settings (`.cursor/mcp.json`):
-
-### For Stdio Mode:
+#### For Stdio Mode:
 ```json
 {
   "mcpServers": {
@@ -130,18 +139,19 @@ Add this to your Cursor MCP settings (`.cursor/mcp.json`):
 }
 ```
 
-### For HTTP Mode:
+#### For HTTP Server Mode:
 ```json
 {
   "mcpServers": {
     "jira": {
-      "url": "http://localhost:3000/mcp"
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-everything", "http://localhost:8000/sse"]
     }
   }
 }
 ```
 
-### For Docker:
+#### For Docker (Stdio Mode):
 ```json
 {
   "mcpServers": {
@@ -159,43 +169,70 @@ Add this to your Cursor MCP settings (`.cursor/mcp.json`):
 }
 ```
 
+#### For Docker (HTTP Mode):
+```json
+{
+  "mcpServers": {
+    "jira": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-everything", "http://localhost:8000/sse"]
+    }
+  }
+}
+```
+
+### Testing HTTP Server
+
+You can test the HTTP server using the provided test script:
+
+```bash
+# Test server on default port 8000
+python test_http_server.py
+
+# Test server on custom port
+python test_http_server.py 3000
+```
+
+Or visit the server directly in your browser:
+- Main page: `http://localhost:8000/`
+- Health check: `http://localhost:8000/health`
+- SSE endpoint: `http://localhost:8000/sse` (for MCP clients)
+- WebSocket endpoint: `ws://localhost:8000/ws` (for real-time connections)
+
 ## Available Tools
 
-The Python implementation provides all the same tools as the Go version:
+The Python implementation provides 19 comprehensive tools for complete Jira integration:
 
-### Issue Tools
-- `get_issue` - Get detailed issue information
-- `create_issue` - Create a new issue
-- `create_child_issue` - Create a subtask
-- `update_issue` - Update issue fields
-- `list_issue_types` - List available issue types
+### Issue Management Tools
+- `get_issue` - Get detailed issue information with customizable fields
+- `create_issue` - Create a new issue with full field support
+- `create_child_issue` - Create a subtask with automatic parent linking
+- `update_issue` - Update issue fields with conflict resolution
+- `list_issue_types` - List available issue types for projects
+- `transition_issue` - Transition issue through workflow states
 
-### Search Tools
-- `search_issue` - Search issues with JQL
+### Search & Query Tools
+- `search_issues` - Search issues with JQL and advanced filtering
 
-### Sprint Tools
-- `list_sprints` - List sprints for a board/project
-- `get_sprint` - Get detailed sprint information
-- `get_active_sprint` - Get currently active sprint
-- `move_issues_to_sprint` - Move issues to a sprint
+### Sprint Management Tools
+- `list_sprints` - List sprints for boards/projects with status filtering
+- `get_sprint` - Get detailed sprint information by ID
+- `get_active_sprint` - Get currently active sprint with metrics
+- `move_issues_to_sprint` - Move multiple issues to sprint (bulk operations)
 
-### Status & Transition Tools
-- `list_project_statuses` - List available statuses
-- `transition_issue` - Transition issue to new status
+### Project & Status Tools
+- `list_project_statuses` - List available statuses and transitions
+- `get_boards` - Get boards with project associations
 
-### Comment Tools
-- `add_comment` - Add comment to issue
-- `get_comments` - Get all comments from issue
+### Comment & Time Tracking Tools
+- `add_comment` - Add comments with rich text formatting
+- `get_comments` - Get all comments with threading support
+- `add_worklog` - Log time with flexible format support
 
-### Worklog Tools
-- `add_worklog` - Log time spent on issue
-
-### Relationship Tools
-- `link_issues` - Link two issues together
-- `get_related_issues` - Get all related issues
-
-### History Tools
-- `get_issue_history` - Get complete change history
+### Relationship & History Tools
+- `link_issues` - Link issues with relationship types
+- `get_related_issues` - Get complete relationship graph
+- `get_issue_history` - Get detailed change history and transitions
 
 ## Usage Examples
 
@@ -222,27 +259,29 @@ Once configured, you can ask Claude to help with Jira tasks:
 ### Project Structure
 
 ```
-Jira-MCP-Server/
-├── main.py                 # Entry point
-├── requirements.txt        # Dependencies
-├── .env.example           # Environment template
+jira-mcp/
+├── main.py                           # Entry point with stdio/HTTP modes
+├── requirements.txt                  # Dependencies
+├── .env.example                     # Environment template
+├── Dockerfile                       # Docker containerization
 ├── services/
 │   ├── __init__.py
-│   └── jira_client.py     # Jira API client
-├── tools/                 # MCP tools
+│   └── jira_client.py              # Async Jira API client
+├── tools/                          # Comprehensive MCP tools
+│   ├── __init__.py                 # Tool registration
+│   ├── comprehensive_jira_tools.py # Main tool definitions
+│   ├── tool_handlers.py            # Core issue handlers
+│   ├── comment_time_handlers.py    # Comment & worklog handlers
+│   ├── relationship_history_handlers.py # Link & history handlers
+│   ├── sprint_handlers.py          # Sprint management handlers
+│   └── project_handlers.py         # Project & status handlers
+├── utils/
 │   ├── __init__.py
-│   ├── jira_issue.py
-│   ├── jira_search.py
-│   ├── jira_sprint.py
-│   ├── jira_status.py
-│   ├── jira_transition.py
-│   ├── jira_worklog.py
-│   ├── jira_comment.py
-│   ├── jira_history.py
-│   └── jira_relationship.py
-└── utils/
-    ├── __init__.py
-    └── jira_formatter.py   # Output formatting
+│   └── jira_formatter.py           # AI-optimized formatting
+└── Extra/
+    ├── PROJECT_OVERVIEW.md          # Project documentation
+    ├── USAGE_GUIDE.md              # Usage examples
+    └── run_mcp.sh                  # Helper script
 ```
 
 ### Debug Mode
@@ -250,7 +289,7 @@ Jira-MCP-Server/
 Run with debug logging:
 
 ```bash
-python main.py --env .env --http-port 3000
+python main.py --env .env
 ```
 
 Then check the console output for detailed error messages.
