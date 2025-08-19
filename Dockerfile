@@ -21,8 +21,11 @@ COPY . .
 RUN useradd -m -u 1000 jira-mcp && chown -R jira-mcp:jira-mcp /app
 USER jira-mcp
 
-# Expose port for HTTP mode
-EXPOSE 3000
+# Expose ports for HTTP mode
+EXPOSE 8000
 
-# Default command (can be overridden)
-CMD ["python", "main.py"]
+# Use ENTRYPOINT to allow arguments
+ENTRYPOINT ["python", "main.py"]
+
+# Default arguments (can be overridden)
+CMD []

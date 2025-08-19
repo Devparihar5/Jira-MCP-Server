@@ -1,4 +1,4 @@
-# Jira MCP Server - Python Implementation
+# Jira MCP Server
 
 A comprehensive Python-based MCP (Model Context Protocol) server for Atlassian Jira that enables AI assistants like Claude to interact with Jira seamlessly. This enterprise-grade solution provides full-featured Jira integration with robust error handling, multiple deployment modes, and extensive tool coverage.
 
@@ -57,12 +57,12 @@ A comprehensive Python-based MCP (Model Context Protocol) server for Atlassian J
 
 ```bash
 # Clone the repository
-git clone <repository-url>
-cd python-jira-mcp
+git clone https://github.com/Devparihar5/Jira-MCP-Server.git
+cd Jira-MCP-Server
 
 # Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+python -m .venv venv
+source .venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
@@ -117,9 +117,6 @@ python main.py --http --env .env
 
 # Start HTTP server on custom port
 python main.py --http --port 3000 --env .env
-
-# Using the convenience script
-./start_http_server.sh --port 8000 --env .env
 ```
 
 ## Configuration
@@ -180,24 +177,6 @@ python main.py --http --port 3000 --env .env
   }
 }
 ```
-
-### Testing HTTP Server
-
-You can test the HTTP server using the provided test script:
-
-```bash
-# Test server on default port 8000
-python test_http_server.py
-
-# Test server on custom port
-python test_http_server.py 3000
-```
-
-Or visit the server directly in your browser:
-- Main page: `http://localhost:8000/`
-- Health check: `http://localhost:8000/health`
-- SSE endpoint: `http://localhost:8000/sse` (for MCP clients)
-- WebSocket endpoint: `ws://localhost:8000/ws` (for real-time connections)
 
 ## Available Tools
 
@@ -275,24 +254,10 @@ jira-mcp/
 │   ├── relationship_history_handlers.py # Link & history handlers
 │   ├── sprint_handlers.py          # Sprint management handlers
 │   └── project_handlers.py         # Project & status handlers
-├── utils/
-│   ├── __init__.py
-│   └── jira_formatter.py           # AI-optimized formatting
-└── Extra/
-    ├── PROJECT_OVERVIEW.md          # Project documentation
-    ├── USAGE_GUIDE.md              # Usage examples
-    └── run_mcp.sh                  # Helper script
+└── utils/
+    ├── __init__.py
+    └── jira_formatter.py           # AI-optimized formatting
 ```
-
-### Debug Mode
-
-Run with debug logging:
-
-```bash
-python main.py --env .env
-```
-
-Then check the console output for detailed error messages.
 
 ## Contributing
 
