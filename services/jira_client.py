@@ -26,6 +26,8 @@ class JiraService:
         
         self.jira = None
         self._http_client = None
+        self.headers = {"Content-Type": "application/json"}
+
     
     async def initialize(self):
         """Initialize the Jira client and HTTP client."""
@@ -93,15 +95,14 @@ class JiraService:
             "startAt": start_at,
             "maxResults": max_results
         }
-        
         if fields:
             data["fields"] = fields
         if expand:
             data["expand"] = expand
-        
-        response = await self._http_client.post(
-            f"{self.host}/rest/api/3/search",
-            json=data
+        response = await self._http_client.get(
+            f"{self.host}/rest/api/3/search/jql",
+            headers=self.headers,
+            params=data
         )
         response.raise_for_status()
         return response.json()

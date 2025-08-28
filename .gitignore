@@ -8,7 +8,7 @@
 .env
 .venv/
 Extra/
-
+test.py
 # Distribution / packaging
 .Python
 build/
